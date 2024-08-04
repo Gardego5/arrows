@@ -1,0 +1,4 @@
+.direnv
+static/client.wasm
+static/style.css
+static/wasm_exec.js
