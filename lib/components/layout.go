@@ -13,7 +13,7 @@ func Layout(title string, head []HTMLElement, children ...HTMLElement) HTMLEleme
 			head,
 			Link{{"rel", "stylesheet"}, {"href", "/static/style.css"}},
 		},
-		Body{lib.CN("bg-pink-300 dark:bg-pink-800"),
+		Body{lib.CN("bg-pink-300 dark:bg-pink-800 h-screen"),
 			children,
 		},
 	}}

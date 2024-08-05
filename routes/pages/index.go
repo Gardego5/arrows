@@ -14,6 +14,9 @@ type hIndex struct{ *lib.State }
 func (h hIndex) handle(c echo.Context) error {
 	return c.Stream(http.StatusOK, "text/html", components.Layout("Home", nil,
 		H1{lib.CN("text-blue-500"), "Arrows!"},
-		Iframe{Attrs{{"src", "/game/app"}, {"width", "720"}, {"height", "480"}}},
+		Iframe{
+			Attrs{{"src", "/game/app"}, {"width", "80%"}, {"height", "80%"}},
+			lib.CN("m-auto"),
+		},
 	).Reader())
 }

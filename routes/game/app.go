@@ -25,10 +25,7 @@ WebAssembly
 `
 
 	return c.Stream(http.StatusOK, "text/html", Fragment{DOCTYPE, Html{
-		Head{
-			Script{Attrs{{"src", "/static/wasm_exec.js"}}},
-			Script{PreEscaped(script)},
-		},
-		Body{lib.CN("overflow-hidden")},
+		Script{Attrs{{"src", "/static/wasm_exec.js"}}},
+		Script{PreEscaped(script)},
 	}}.Reader())
 }

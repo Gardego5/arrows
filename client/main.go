@@ -4,44 +4,59 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	"log"
-	"strconv"
-	"strings"
 
+	"github.com/Gardego5/arrows/game"
+	"github.com/Gardego5/arrows/game/lib/world"
+	"github.com/Gardego5/arrows/lib/palette"
 	"github.com/hajimehoshi/ebiten/v2"
-	"honnef.co/go/js/dom/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/mlange-42/arche/generic"
 )
 
-type game struct{}
+type Game struct {
+	world.Sim
+}
 
-func (g *game) Draw(screen *ebiten.Image)                         { screen.Fill(color.RGBA{R: 255}) }
-func (g *game) Layout(outsideWidth, outsideHeight int) (int, int) { return 720, 480 }
-func (g *game) Update() error {
-	el := dom.GetWindow().Document().QuerySelector("canvas")
-	canvas, ok := el.(*dom.HTMLCanvasElement)
-	if !ok {
-		return fmt.Errorf("unexpected element type %T", el)
+var (
+	w           = game.CreateWorld()
+	dimResource = generic.NewResource[game.Dimensions](&w.World)
+	g           = &Game{w}
+)
+
+func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+	fmt.Printf("Layout: %d %d\n", outsideWidth, outsideHeight)
+
+	if dimResource.Has() {
+		dim := dimResource.Get()
+		dim.Width, dim.Height = outsideWidth, outsideHeight
 	}
 
-	height := canvas.Style().Get("height").String()
-	percentString := strings.TrimSuffix(height, "%")
-	percent, err := strconv.ParseFloat(percentString, 64)
-	if err != nil {
-		return err
+	return outsideWidth, outsideHeight
+}
+
+func (g *Game) Draw(screen *ebiten.Image) {
+	query := generic.NewFilter1[game.Position]().Query(&g.Sim.World)
+	for query.Next() {
+		pos := query.Get()
+
+		vector.StrokeLine(screen,
+			float32(pos.X-2), float32(pos.Y-2),
+			float32(pos.X+2), float32(pos.Y+2),
+			2, palette.Azul, true)
+		vector.StrokeLine(screen,
+			float32(pos.X-2), float32(pos.Y+2),
+			float32(pos.X+2), float32(pos.Y-2),
+			2, palette.Azul, true)
 	}
+}
 
-	percent -= 0.2
-	canvas.Style().Set("height", fmt.Sprintf("%f%%", percent))
-
-	return nil
+func init() {
+	ebiten.SetWindowSize(720, 480)
+	ebiten.SetWindowTitle("Hello, World!")
 }
 
 func main() {
-	g := &game{}
-
-	ebiten.SetWindowSize(720, 480)
-	ebiten.SetWindowTitle("Hello, World!")
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
